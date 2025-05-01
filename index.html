@@ -6,77 +6,114 @@
   <title>Infectious Disease Monitoring Dashboard</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
       background-color: #f4f7f8;
       color: #333;
     }
+
     header {
-      background-color: #2a9d8f;
-      color: #fff;
-      padding: 15px 20px;
+      background: linear-gradient(to right, #2a9d8f, #21867a);
+      color: white;
+      padding: 20px;
       text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
+
     main {
       max-width: 1100px;
       margin: 20px auto;
-      padding: 0 15px 30px 15px;
+      padding: 0 20px 40px;
     }
+
     section {
-      background-color: #fff;
-      border-radius: 6px;
+      background-color: white;
+      border-radius: 8px;
       padding: 20px;
       margin-bottom: 25px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      transition: transform 0.3s;
     }
-    h1, h2, h3 {
+
+    section:hover {
+      transform: scale(1.01);
+    }
+
+    h1, h2 {
       margin-top: 0;
     }
-    canvas {
-      max-width: 100%;
-      height: 300px;
-    }
-    label {
-      display: inline-block;
-      margin-right: 10px;
-      font-weight: bold;
-    }
-    select {
-      padding: 5px;
-      font-size: 1em;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
+
+    select, button {
+      padding: 8px 12px;
       margin-top: 10px;
+      font-size: 1rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
     }
+
+    button {
+      background-color: #2a9d8f;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #21867a;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
     th, td {
       border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
+      padding: 10px;
     }
+
     th {
       background-color: #2a9d8f;
       color: white;
     }
+
     footer {
-      text-align: center;
-      padding: 15px 10px;
       background-color: #e9ecef;
+      text-align: center;
+      padding: 15px;
       font-size: 0.9em;
       color: #666;
     }
+
+    .hidden {
+      display: none;
+    }
+
+    .status {
+      font-style: italic;
+      margin-top: 10px;
+      color: #555;
+    }
+
   </style>
 </head>
 <body>
+
   <header>
-    <h1>Infectious Disease Monitoring Dashboard</h1>
-    <p>Integrating Social Media Insights & Public Health Data</p>
+    <h1>🦠 Infectious Disease Monitoring Dashboard</h1>
+    <p>Track symptoms using social media trends and sentiment analysis</p>
   </header>
 
   <main>
     <section>
-      <h2>1. Select Symptom</h2>
+      <h2>🔍 Select Symptom</h2>
       <label for="symptom">Symptom:</label>
       <select id="symptom">
         <option value="fever">Fever</option>
@@ -84,21 +121,21 @@
         <option value="flu">Flu</option>
       </select>
       <button onclick="loadData()">Analyze</button>
-      <p id="status"></p>
+      <p class="status" id="status">Waiting for input...</p>
     </section>
 
-    <section id="trend-section" style="display:none;">
-      <h2>2. Trend Over Time</h2>
+    <section id="trend-section" class="hidden">
+      <h2>📈 Trend Over Time</h2>
       <canvas id="trendChart"></canvas>
     </section>
 
-    <section id="sentiment-section" style="display:none;">
-      <h2>3. Sentiment Analysis</h2>
+    <section id="sentiment-section" class="hidden">
+      <h2>💬 Sentiment Analysis</h2>
       <canvas id="sentimentChart"></canvas>
     </section>
 
-    <section id="table-section" style="display:none;">
-      <h2>4. Sample Posts</h2>
+    <section id="table-section" class="hidden">
+      <h2>📝 Sample Posts</h2>
       <table>
         <thead>
           <tr><th>Date</th><th>Text</th><th>Location</th></tr>
@@ -109,7 +146,7 @@
   </main>
 
   <footer>
-    <p>Biotech-Driven Digital Surveillance System Prototype © 2024</p>
+    Biotech-Driven Digital Surveillance System © 2024
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -117,18 +154,18 @@
     const data = {
       fever: [
         { date: '2024-06-01', text: 'High fever and chills', location: 'New York' },
-        { date: '2024-06-02', text: 'Fever symptoms spreading', location: 'London' },
-        { date: '2024-06-03', text: 'Sick with fever today', location: 'Mumbai' }
+        { date: '2024-06-02', text: 'Fever spreading fast', location: 'London' },
+        { date: '2024-06-03', text: 'Worried about this fever spike', location: 'Delhi' }
       ],
       cough: [
-        { date: '2024-06-01', text: 'Dry cough won’t stop', location: 'Paris' },
-        { date: '2024-06-02', text: 'Lots of coughing cases', location: 'Berlin' },
-        { date: '2024-06-03', text: 'Persistent cough for days', location: 'Toronto' }
+        { date: '2024-06-01', text: 'Coughing nonstop', location: 'Paris' },
+        { date: '2024-06-02', text: 'Dry cough symptoms everywhere', location: 'Berlin' },
+        { date: '2024-06-03', text: 'Severe cough symptoms today', location: 'Tokyo' }
       ],
       flu: [
-        { date: '2024-06-01', text: 'Flu season starts early', location: 'Sydney' },
-        { date: '2024-06-02', text: 'Symptoms: fever, fatigue, cough', location: 'Chicago' },
-        { date: '2024-06-03', text: 'Got the flu despite vaccine', location: 'Tokyo' }
+        { date: '2024-06-01', text: 'Flu season hits early', location: 'Toronto' },
+        { date: '2024-06-02', text: 'Symptoms of flu spreading', location: 'Chicago' },
+        { date: '2024-06-03', text: 'Flu spike this week', location: 'Seoul' }
       ]
     };
 
@@ -146,30 +183,34 @@
         dateCounts[post.date] = (dateCounts[post.date] || 0) + 1;
       });
 
-      // Sentiment (fake: hardcoded counts)
-      const sentiments = {
-        fever: [2, 0, 1],
-        cough: [1, 1, 1],
-        flu: [1, 1, 1]
-      };
-
       // Update trend chart
       const trendCtx = document.getElementById('trendChart').getContext('2d');
       new Chart(trendCtx, {
-        type: 'line',
+        type: 'bar',
         data: {
           labels: Object.keys(dateCounts),
           datasets: [{
             label: 'Posts per day',
             data: Object.values(dateCounts),
-            borderColor: '#2a9d8f',
-            backgroundColor: 'rgba(42,157,143,0.3)',
-            fill: true
+            backgroundColor: '#2a9d8f'
           }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: 'Daily Post Count' }
+          }
         }
       });
 
-      // Update sentiment chart
+      // Dummy sentiment values
+      const sentiments = {
+        fever: [1, 1, 1],
+        cough: [2, 0, 1],
+        flu: [1, 1, 1]
+      };
+
       const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
       new Chart(sentimentCtx, {
         type: 'pie',
@@ -179,22 +220,27 @@
             data: sentiments[selected],
             backgroundColor: ['#27ae60', '#e74c3c', '#95a5a6']
           }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: { display: true, text: 'Sentiment Distribution' }
+          }
         }
       });
 
-      // Update table
+      // Fill table
       const table = document.getElementById('posts-table');
       table.innerHTML = '';
       posts.forEach(p => {
-        const row = `<tr><td>${p.date}</td><td>${p.text}</td><td>${p.location}</td></tr>`;
-        table.innerHTML += row;
+        table.innerHTML += `<tr><td>${p.date}</td><td>${p.text}</td><td>${p.location}</td></tr>`;
       });
 
       // Show sections
-      trendSection.style.display = 'block';
-      sentimentSection.style.display = 'block';
-      tableSection.style.display = 'block';
-      status.textContent = `Loaded ${posts.length} posts for ${selected}`;
+      trendSection.classList.remove('hidden');
+      sentimentSection.classList.remove('hidden');
+      tableSection.classList.remove('hidden');
+      status.textContent = `Analyzed ${posts.length} posts for “${selected}”.`;
     }
   </script>
 </body>
