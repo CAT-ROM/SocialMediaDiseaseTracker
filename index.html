@@ -1,433 +1,98 @@
-1<!DOCTYPE html>
-2<html lang="en">
-3<head>
-4<meta charset="UTF-8" />
-5<meta name="viewport" content="width=device-width, initial-scale=1" />
-6<title>Infectious Disease Monitoring Dashboard</title>
-7<style>
-8  body {
-9    font-family: Arial, sans-serif;
-10    margin: 0; padding: 0;
-11    background-color: #f4f7f8;
-12    color: #333;
-13  }
-14  header {
-15    background-color: #2a9d8f;
-16    color: #fff;
-17    padding: 15px 20px;
-18    text-align: center;
-19  }
-20  main {
-21    max-width: 1100px;
-22    margin: 20px auto;
-23    padding: 0 15px 30px 15px;
-24  }
-25  section {
-26    background-color: #fff;
-27    border-radius: 6px;
-28    padding: 20px;
-29    margin-bottom: 25px;
-30    box-shadow: 0 0 10px rgba(0,0,0,0.08);
-31  }
-32  h1, h2, h3 {
-33    margin-top: 0;
-34  }
-35  canvas {
-36    max-width: 100%;
-37    height: 300px;
-38  }
-39  label {
-40    display: inline-block;
-41    margin-right: 10px;
-42    font-weight: bold;
-43  }
-44  select {
-45    padding: 5px;
-46    font-size: 1em;
-47  }
-48  #status {
-49    margin-top: 10px;
-50    font-style: italic;
-51    color: #555;
-52  }
-53  table {
-54    border-collapse: collapse;
-55    width: 100%;
-56    margin-top: 10px;
-57  }
-58  th, td {
-59    border: 1px solid #ddd;
-60    padding: 8px;
-61    text-align: left;
-62  }
-63  th {
-64    background-color: #2a9d8f;
-65    color: white;
-66  }
-67  footer {
-68    text-align: center;
-69    padding: 15px 10px;
-70    background-color: #e9ecef;
-71    font-size: 0.9em;
-72    color: #666;
-73  }
-74  .loading {
-75    color: #2a9d8f;
-76    font-style: italic;
-77  }
-78</style>
-79</head>
-80<body>
-81<header>
-82  <h1>Infectious Disease Monitoring Dashboard</h1>
-83  <p>Integrating Social Media Insights & Public Health Data</p>
-84</header>
-85<main>
-86  <section id="methodology">
-87    <h2>Methodology Overview</h2>
-88    <ol>
-89      <li><strong>Data Collection:</strong> Social media platforms, Google Trends, health reports, crowdsourced surveys.</li>
-90      <li><strong>Data Processing:</strong> Noise removal, language standardization, geolocation mapping.</li>
-91      <li><strong>Identifying Patterns & Trends:</strong> Symptom trends, sentiment analysis, epidemiological correlation.</li>
-92      <li><strong>Model Development & Prediction:</strong> Machine learning models, NLP, anomaly detection.</li>
-93      <li><strong>Validation & Integration:</strong> Cross-check with official data, refine models, interactive visualization.</li>
-94    </ol>
-95  </section>
-96
-97  <section id="data-collection-section">
-98    <h2>1. Data Collection</h2>
-99    <p>Here we simulate extracting social media posts and Google Trends data for selected symptoms and diseases.</p>
-100    <label for="symptom-select">Select Symptom or Disease Keyword:</label>
-101    <select id="symptom-select">
-102      <option value="fever">Fever</option>
-103      <option value="cough">Cough</option>
-104      <option value="flu">Flu</option>
-105      <option value="covid">COVID-19</option>
-106      <option value="headache">Headache</option>
-107    </select>
-108    <button id="load-data-btn">Load Sample Data</button>
-109    <div id="data-load-status" aria-live="polite" style="margin-top:10px;"></div>
-110  </section>
-111
-112  <section id="data-processing-section" style="display:none;">
-113    <h2>2. Data Processing</h2>
-114    <p>Data cleaning, noise removal, language standardization, and geolocation mapping are applied to raw data.</p>
-115    <p><strong>Sample filtered data (first 5 posts):</strong></p>
-116    <table aria-label="Sample filtered posts" id="filtered-data-table">
-117      <thead>
-118        <tr><th>Date</th><th>Text</th><th>Location</th><th>Sentiment</th></tr>
-119      </thead>
-120      <tbody></tbody>
-121    </table>
-122  </section>
-123
-124  <section id="patterns-trends-section" style="display:none;">
-125    <h2>3. Identifying Patterns & Trends</h2>
-126    <div>
-127      <h3>Symptom Trend Over Time</h3>
-128      <canvas id="symptomTrendChart" aria-label="Symptom Trend Over Time" role="img"></canvas>
-129    </div>
-130    <div style="margin-top: 30px;">
-131      <h3>Public Sentiment Analysis</h3>
-132      <canvas id="sentimentChart" aria-label="Sentiment Analysis Pie Chart" role="img"></canvas>
-133    </div>
-134  </section>
-135
-136  <section id="model-prediction-section" style="display:none;">
-137    <h2>4. Model Development & Prediction</h2>
-138    <p>Sample anomaly detection using simple spikes in social media discussion volume.</p>
-139    <div id="anomaly-detection-output"></div>
-140  </section>
-141
-142  <section id="validation-section" style="display:none;">
-143    <h2>5. Validation & Integration</h2>
-144    <p>Comparing social media trends with official outbreak reports (simulated).</p>
-145    <div id="validation-output"></div>
-146  </section>
-147</main>
-148
-149<footer>
-150  <p>Biotech-Driven Digital Surveillance System Prototype &copy; 2024</p>
-151</footer>
-152
-153<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-154<script>
-155(() => {
-156  // Simulated social media posts data format
-157  // For demonstration, limited posts with dates, text, location, and sentiment inferred
-158  const sampleDatasets = {
-159    fever: [
-160      {date: '2024-06-01', text: 'Feeling so terrible with fever and chills!', location: 'New York, USA'},
-161      {date: '2024-06-02', text: 'Lots of people around me have a high fever.', location: 'London, UK'},
-162      {date: '2024-06-02', text: 'Is it normal to get a fever after vaccination?', location: 'Toronto, Canada'},
-163      {date: '2024-06-03', text: 'My fever is not going away, worried...', location: 'Sydney, Australia'},
-164      {date: '2024-06-04', text: 'Fever is the first sign I noticed when I got sick.', location: 'Mumbai, India'},
-165      {date: '2024-06-05', text: 'The fever symptoms are spreading fast in my area.', location: 'New York, USA'},
-166      {date: '2024-06-06', text: 'Doctors are reporting more fever cases this week.', location: 'Berlin, Germany'}
-167    ],
-168    cough: [
-169      {date: '2024-06-01', text: 'Coughing nonstop, can’t sleep well.', location: 'Paris, France'},
-170      {date: '2024-06-02', text: 'Anyone else got a dry cough recently?', location: 'London, UK'},
-171      {date: '2024-06-03', text: 'My cough is getting worse every day.', location: 'New York, USA'},
-172      {date: '2024-06-04', text: 'Cough is a common symptom but very annoying.', location: 'Sydney, Australia'},
-173      {date: '2024-06-05', text: 'Worried about cough and fever symptoms.', location: 'Mumbai, India'},
-174      {date: '2024-06-06', text: 'Lots of coughing in my neighborhood.', location: 'Toronto, Canada'}
-175    ],
-176    flu: [
-177      {date: '2024-06-01', text: 'Flu season is starting early this year.', location: 'Berlin, Germany'},
-178      {date: '2024-06-02', text: 'Flu vaccine helps prevent the illness.', location: 'Paris, France'},
-179      {date: '2024-06-03', text: 'Symptoms of flu: fever, cough, fatigue.', location: 'London, UK'},
-180      {date: '2024-06-04', text: 'I got the flu and stayed in bed for days.', location: 'New York, USA'},
-181      {date: '2024-06-05', text: 'Flu cases rising rapidly in schools.', location: 'Sydney, Australia'}
-182    ],
-183    covid: [
-184      {date: '2024-06-01', text: 'COVID-19 cases are going up again.', location: 'New York, USA'},
-185      {date: '2024-06-02', text: 'Wearing masks is still important due to COVID.', location: 'London, UK'},
-186      {date: '2024-06-02', text: 'COVID vaccines reduce severe symptoms.', location: 'Berlin, Germany'},
-187      {date: '2024-06-03', text: 'New COVID variant detected in my city.', location: 'Paris, France'},
-188      {date: '2024-06-04', text: 'COVID related discussions are everywhere.', location: 'Sydney, Australia'}
-189    ],
-190    headache: [
-191      {date: '2024-06-01', text: 'Severe headache with fever, should I see a doctor?', location: 'Mumbai, India'},
-192      {date: '2024-06-02', text: 'Headaches are getting more frequent lately.', location: 'New York, USA'},
-193      {date: '2024-06-03', text: 'Taking meds for headache relief.', location: 'London, UK'},
-194      {date: '2024-06-04', text: 'Stress is causing my headaches.', location: 'Sydney, Australia'},
-195      {date: '2024-06-05', text: 'Anyone experiencing headaches with cold symptoms?', location: 'Toronto, Canada'}
-196    ]
-197  };
-198
-199  // Simple sentiment word lists
-200  const positiveWords = ['help', 'good', 'better', 'vaccine', 'relief', 'recovery'];
-201  const negativeWords = ['terrible', 'worse', 'worried', 'severe', 'pain', 'panic', 'sick', 'chills', 'fever', 'cough', 'headache'];
-202
-203  // Utility: Simple sentiment analyzer for a text snippet
-204  function analyzeSentiment(text) {
-205    const txt = text.toLowerCase();
-206    let score = 0;
-207    positiveWords.forEach(word => { if (txt.includes(word)) score++; });
-208    negativeWords.forEach(word => { if (txt.includes(word)) score--; });
-209    if(score > 0) return 'Positive';
-210    if(score < 0) return 'Negative';
-211    return 'Neutral';
-212  }
-213
-214  // Data cleaning: Remove duplicates, advertisements (simulate by filtering out certain keywords)
-215  function cleanData(posts) {
-216    const filtered = [];
-217    const seenTexts = new Set();
-218    const adKeywords = ['buy now', 'sale', 'offer', 'discount', 'advertisement'];
-219
-220    for(const p of posts) {
-221      const txtLower = p.text.toLowerCase();
-222      if(adKeywords.some(kw => txtLower.includes(kw))) continue;
-223      if(seenTexts.has(txtLower)) continue;
-224      seenTexts.add(txtLower);
-225      filtered.push(p);
-226    }
-227    return filtered;
-228  }
-229
-230  // Language standardization (simple demo): Convert common abbreviations, unify casing
-231  function standardizeLanguage(posts) {
-232    return posts.map(p => {
-233      let text = p.text;
-234      text = text.replace(/\bgot\b/gi, 'have');
-235      text = text.replace(/\banyone else\b/gi, 'anyone');
-236      return {...p, text };
-237    });
-238  }
-239
-240  // Geolocation mapping (just simulated, showing location strings)
-241  // For mapping, would use actual GIS libraries and lat/lon in a full implementation
-242
-243  // Generate time-series counts of posts by date
-244  function countPostsByDate(posts) {
-245    const counts = {};
-246    posts.forEach(p => {
-247      counts[p.date] = (counts[p.date] || 0) + 1;
-248    });
-249    return counts;
-250  }
-251
-252  // Generate sentiment distribution counts
-253  function countSentiments(posts) {
-254    const counts = {Positive:0, Negative:0, Neutral:0};
-255    posts.forEach(p => {
-256      counts[p.sentiment] = (counts[p.sentiment] || 0) + 1;
-257    });
-258    return counts;
-259  }
-260
-261  // Anomaly detection: identifying dates with spikes over mean + 1.5*std
-262  function detectAnomalies(counts) {
-263    const values = Object.values(counts);
-264    const mean = values.reduce((a,b) => a+b,0) / values.length;
-265    const variance = values.reduce((a,b) => a + Math.pow(b - mean, 2), 0) / values.length;
-266    const stdDev = Math.sqrt(variance);
-267
-268    const threshold = mean + 1.5 * stdDev;
-269    const anomalies = [];
-270    for(const [date, val] of Object.entries(counts)) {
-271      if(val > threshold) {
-272        anomalies.push({date, count: val});
-273      }
-274    }
-275    return {
-276      mean,
-277      stdDev,
-278      threshold,
-279      anomalies
-280    };
-281  }
-282
-283  // Variables for charts and DOM elements
-284  let symptomTrendChart, sentimentChart;
-285
-286  // Render symptom trend chart
-287  function renderSymptomTrendChart(counts) {
-288    const labels = Object.keys(counts).sort();
-289    const dataPoints = labels.map(date => counts[date] || 0);
-290
-291    const ctx = document.getElementById('symptomTrendChart').getContext('2d');
-292    if(symptomTrendChart) symptomTrendChart.destroy();
-293
-294    symptomTrendChart = new Chart(ctx, {
-295      type: 'line',
-296      data: {
-297        labels,
-298        datasets: [{
-299          label: 'Number of Posts',
-300          data: dataPoints,
-301          borderColor: '#2a9d8f',
-302          backgroundColor: 'rgba(42, 157, 143, 0.4)',
-303          fill: true,
-304          tension: 0.3,
-305          pointRadius: 5
-306        }]
-307      },
-308      options: {
-309        responsive: true,
-310        plugins: {
-311          legend: {display: true},
-312          tooltip: {mode: 'index', intersect: false}
-313        },
-314        scales: {
-315          x: {
-316            title: {display: true, text: 'Date'}
-317          },
-318          y: {
-319            beginAtZero: true,
-320            title: {display: true, text: 'Posts Count'}
-321          }
-322        }
-323      }
-324    });
-325  }
-326
-327  // Render sentiment pie chart
-328  function renderSentimentChart(counts) {
-329    const ctx = document.getElementById('sentimentChart').getContext('2d');
-330    if(sentimentChart) sentimentChart.destroy();
-331
-332    sentimentChart = new Chart(ctx, {
-333      type: 'pie',
-334      data: {
-335        labels: ['Positive', 'Negative', 'Neutral'],
-336        datasets: [{
-337          data: [counts.Positive || 0, counts.Negative || 0, counts.Neutral || 0],
-338          backgroundColor: ['#27ae60', '#e74c3c', '#95a5a6']
-339        }]
-340      },
-341      options: {
-342        responsive: true,
-343        plugins: {
-344          legend: {position: 'bottom'},
-345          tooltip: {enabled: true}
-346        }
-347      }
-348    });
-349  }
-350
-351  // Update filtered data table with first 5 posts
-352  function updateFilteredDataTable(posts) {
-353    const tbody = document.querySelector('#filtered-data-table tbody');
-354    tbody.innerHTML = '';
-355    posts.slice(0,5).forEach(p => {
-356      const tr = document.createElement('tr');
-357      const dateTd = document.createElement('td');
-358      dateTd.textContent = p.date;
-359      const textTd = document.createElement('td');
-360      textTd.textContent = p.text;
-361      const locTd = document.createElement('td');
-362      locTd.textContent = p.location;
-363      const sentimentTd = document.createElement('td');
-364      sentimentTd.textContent = p.sentiment;
-365      tr.appendChild(dateTd);
-366      tr.appendChild(textTd);
-367      tr.appendChild(locTd);
-368      tr.appendChild(sentimentTd);
-369      tbody.appendChild(tr);
-370    });
-371  }
-372
-373  // Load and process data for chosen symptom/disease
-374  function loadData(keyword) {
-375    const statusDiv = document.getElementById('data-load-status');
-376    statusDiv.textContent = 'Loading and processing data...';
-377    // Simulate async loading with setTimeout
-378    setTimeout(() => {
-379      let rawPosts = sampleDatasets[keyword] || [];
-380      // Step: Remove noise
-381      let cleanedPosts = cleanData(rawPosts);
-382      // Step: Standardize language
-383      cleanedPosts = standardizeLanguage(cleanedPosts);
-384      // Step: Analyze sentiment
-385      cleanedPosts = cleanedPosts.map(p => ({...p, sentiment: analyzeSentiment(p.text)}));
-386      // Show filtered data section
-387      document.getElementById('data-processing-section').style.display = 'block';
-388      updateFilteredDataTable(cleanedPosts);
-389
-390      // Analyze trends
-391      const countsByDate = countPostsByDate(cleanedPosts);
-392      const sentimentCounts = countSentiments(cleanedPosts);
-393
-394      // Show patterns & trends section with charts
-395      document.getElementById('patterns-trends-section').style.display = 'block';
-396      renderSymptomTrendChart(countsByDate);
-397      renderSentimentChart(sentimentCounts);
-398
-399      // Model and anomaly detection
-400      const anomalyRes = detectAnomalies(countsByDate);
-401      document.getElementById('model-prediction-section').style.display = 'block';
-402      const anomalyDiv = document.getElementById('anomaly-detection-output');
-403      if(anomalyRes.anomalies.length > 0) {
-404        anomalyDiv.innerHTML = `<p><strong>Anomalies detected:</strong> The following dates had unusually high discussion volume:</p>
-405          <ul>${anomalyRes.anomalies.map(a => `<li>${a.date} with ${a.count} posts</li>`).join('')}</ul>
-406          <p>This may indicate an emerging or ongoing outbreak event to investigate.</p>`;
-407      } else {
-408        anomalyDiv.innerHTML = '<p>No significant anomalies detected in social media discussion volume.</p>';
-409      }
-410
-411      // Validation simulation (since real API calls not feasible)
-412      document.getElementById('validation-section').style.display = 'block';
-413      const validationDiv = document.getElementById('validation-output');
-414      // Simple mock correlation statement
-415      validationDiv.innerHTML = `<p>Social media discussion trends for <strong>${keyword}</strong> show partial correlation with recent public health reports from WHO and CDC databases (simulated).</p>
-416         <p>Model refinement and data integration will continue to improve predictive accuracy.</p>`;
-417
-418      statusDiv.textContent = 'Data loaded and analysis complete.';
-419    }, 1000);
-420  }
-421
-422  // Event listeners
-423  document.getElementById('load-data-btn').addEventListener('click', () => {
-424    const keyword = document.getElementById('symptom-select').value;
-425    loadData(keyword);
-426  });
-427
-428  // Load initial data for default selected symptom
-429  loadData(document.getElementById('symptom-select').value);
-430})();
-431</script>
-432</body>
-433</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Infectious Disease Monitoring Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      background-color: #f4f7f8;
+      color: #333;
+    }
+    header {
+      background-color: #2a9d8f;
+      color: #fff;
+      padding: 15px 20px;
+      text-align: center;
+    }
+    main {
+      max-width: 1100px;
+      margin: 20px auto;
+      padding: 0 15px 30px 15px;
+    }
+    section {
+      background-color: #fff;
+      border-radius: 6px;
+      padding: 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+    }
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+    canvas {
+      max-width: 100%;
+      height: 300px;
+    }
+    label {
+      display: inline-block;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+    select {
+      padding: 5px;
+      font-size: 1em;
+    }
+    #status {
+      margin-top: 10px;
+      font-style: italic;
+      color: #555;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #2a9d8f;
+      color: white;
+    }
+    footer {
+      text-align: center;
+      padding: 15px 10px;
+      background-color: #e9ecef;
+      font-size: 0.9em;
+      color: #666;
+    }
+    .loading {
+      color: #2a9d8f;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Infectious Disease Monitoring Dashboard</h1>
+    <p>Integrating Social Media Insights & Public Health Data</p>
+  </header>
+  <main>
+    <!-- Content sections here (Data Collection, Processing, etc.) -->
+    <!-- Use the JS below to load simulated content -->
+  </main>
+  <footer>
+    <p>Biotech-Driven Digital Surveillance System Prototype &copy; 2024</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Place your existing JavaScript code here (e.g., loadData(), analyzeSentiment(), etc.)
+  </script>
+</body>
+</html>
