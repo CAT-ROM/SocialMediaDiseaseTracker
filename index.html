@@ -33,11 +33,6 @@
       padding: 20px;
       margin-bottom: 25px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-      transition: transform 0.3s;
-    }
-
-    section:hover {
-      transform: scale(1.01);
     }
 
     h1, h2 {
@@ -56,7 +51,6 @@
       background-color: #2a9d8f;
       color: white;
       cursor: pointer;
-      transition: background 0.3s;
     }
 
     button:hover {
@@ -66,6 +60,11 @@
     canvas {
       width: 100% !important;
       height: auto !important;
+    }
+
+    #sentimentChart {
+      max-width: 300px;
+      margin: auto;
     }
 
     table {
@@ -101,11 +100,9 @@
       margin-top: 10px;
       color: #555;
     }
-
   </style>
 </head>
 <body>
-
   <header>
     <h1>🦠 Infectious Disease Monitoring Dashboard</h1>
     <p>Track symptoms using social media trends and sentiment analysis</p>
@@ -119,9 +116,23 @@
         <option value="fever">Fever</option>
         <option value="cough">Cough</option>
         <option value="flu">Flu</option>
+        <option value="covid">COVID-19</option>
       </select>
       <button onclick="loadData()">Analyze</button>
       <p class="status" id="status">Waiting for input...</p>
+    </section>
+
+    <section>
+      <h2>ℹ️ About the Project</h2>
+      <p>This dashboard is a prototype digital surveillance system that tracks public health discussions on social media to detect early signals of disease outbreaks.</p>
+      <h3>Methodology</h3>
+      <ul>
+        <li><strong>Data Collection:</strong> Tweets and search trends related to symptoms and diseases are gathered (simulated in this version).</li>
+        <li><strong>Data Processing:</strong> Removes noise, standardizes language, and maps mentions to locations.</li>
+        <li><strong>Trend Analysis:</strong> Visualizes frequency over time using charts.</li>
+        <li><strong>Sentiment Analysis:</strong> Determines emotional tone of posts.</li>
+        <li><strong>Prediction:</strong> Identifies spikes that may signal outbreaks.</li>
+      </ul>
     </section>
 
     <section id="trend-section" class="hidden">
@@ -166,26 +177,34 @@
         { date: '2024-06-01', text: 'Flu season hits early', location: 'Toronto' },
         { date: '2024-06-02', text: 'Symptoms of flu spreading', location: 'Chicago' },
         { date: '2024-06-03', text: 'Flu spike this week', location: 'Seoul' }
+      ],
+      covid: [
+        { date: '2024-06-01', text: 'COVID-19 cases rising again', location: 'New York' },
+        { date: '2024-06-02', text: 'Mask mandates back due to COVID', location: 'London' },
+        { date: '2024-06-03', text: 'Got my booster shot for COVID-19', location: 'Tokyo' }
       ]
+    };
+
+    const sentiments = {
+      fever: [1, 1, 1],
+      cough: [2, 0, 1],
+      flu: [1, 1, 1],
+      covid: [1, 1, 1]
     };
 
     function loadData() {
       const selected = document.getElementById('symptom').value;
       const posts = data[selected];
-      const status = document.getElementById('status');
-      const trendSection = document.getElementById('trend-section');
-      const sentimentSection = document.getElementById('sentiment-section');
-      const tableSection = document.getElementById('table-section');
+      document.getElementById('status').textContent = `Analyzed ${posts.length} posts for “${selected}”.`;
 
-      // Count by date
       const dateCounts = {};
       posts.forEach(post => {
         dateCounts[post.date] = (dateCounts[post.date] || 0) + 1;
       });
 
-      // Update trend chart
       const trendCtx = document.getElementById('trendChart').getContext('2d');
-      new Chart(trendCtx, {
+      if (window.trendChartInstance) window.trendChartInstance.destroy();
+      window.trendChartInstance = new Chart(trendCtx, {
         type: 'bar',
         data: {
           labels: Object.keys(dateCounts),
@@ -194,25 +213,12 @@
             data: Object.values(dateCounts),
             backgroundColor: '#2a9d8f'
           }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false },
-            title: { display: true, text: 'Daily Post Count' }
-          }
         }
       });
 
-      // Dummy sentiment values
-      const sentiments = {
-        fever: [1, 1, 1],
-        cough: [2, 0, 1],
-        flu: [1, 1, 1]
-      };
-
       const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
-      new Chart(sentimentCtx, {
+      if (window.sentimentChartInstance) window.sentimentChartInstance.destroy();
+      window.sentimentChartInstance = new Chart(sentimentCtx, {
         type: 'pie',
         data: {
           labels: ['Positive', 'Negative', 'Neutral'],
@@ -224,23 +230,21 @@
         options: {
           responsive: true,
           plugins: {
+            legend: { position: 'bottom' },
             title: { display: true, text: 'Sentiment Distribution' }
           }
         }
       });
 
-      // Fill table
       const table = document.getElementById('posts-table');
       table.innerHTML = '';
       posts.forEach(p => {
         table.innerHTML += `<tr><td>${p.date}</td><td>${p.text}</td><td>${p.location}</td></tr>`;
       });
 
-      // Show sections
-      trendSection.classList.remove('hidden');
-      sentimentSection.classList.remove('hidden');
-      tableSection.classList.remove('hidden');
-      status.textContent = `Analyzed ${posts.length} posts for “${selected}”.`;
+      document.getElementById('trend-section').classList.remove('hidden');
+      document.getElementById('sentiment-section').classList.remove('hidden');
+      document.getElementById('table-section').classList.remove('hidden');
     }
   </script>
 </body>
