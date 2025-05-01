@@ -45,11 +45,6 @@
       padding: 5px;
       font-size: 1em;
     }
-    #status {
-      margin-top: 10px;
-      font-style: italic;
-      color: #555;
-    }
     table {
       border-collapse: collapse;
       width: 100%;
@@ -71,10 +66,6 @@
       font-size: 0.9em;
       color: #666;
     }
-    .loading {
-      color: #2a9d8f;
-      font-style: italic;
-    }
   </style>
 </head>
 <body>
@@ -82,17 +73,129 @@
     <h1>Infectious Disease Monitoring Dashboard</h1>
     <p>Integrating Social Media Insights & Public Health Data</p>
   </header>
+
   <main>
-    <!-- Content sections here (Data Collection, Processing, etc.) -->
-    <!-- Use the JS below to load simulated content -->
+    <section>
+      <h2>1. Select Symptom</h2>
+      <label for="symptom">Symptom:</label>
+      <select id="symptom">
+        <option value="fever">Fever</option>
+        <option value="cough">Cough</option>
+        <option value="flu">Flu</option>
+      </select>
+      <button onclick="loadData()">Analyze</button>
+      <p id="status"></p>
+    </section>
+
+    <section id="trend-section" style="display:none;">
+      <h2>2. Trend Over Time</h2>
+      <canvas id="trendChart"></canvas>
+    </section>
+
+    <section id="sentiment-section" style="display:none;">
+      <h2>3. Sentiment Analysis</h2>
+      <canvas id="sentimentChart"></canvas>
+    </section>
+
+    <section id="table-section" style="display:none;">
+      <h2>4. Sample Posts</h2>
+      <table>
+        <thead>
+          <tr><th>Date</th><th>Text</th><th>Location</th></tr>
+        </thead>
+        <tbody id="posts-table"></tbody>
+      </table>
+    </section>
   </main>
+
   <footer>
-    <p>Biotech-Driven Digital Surveillance System Prototype &copy; 2024</p>
+    <p>Biotech-Driven Digital Surveillance System Prototype © 2024</p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    // Place your existing JavaScript code here (e.g., loadData(), analyzeSentiment(), etc.)
+    const data = {
+      fever: [
+        { date: '2024-06-01', text: 'High fever and chills', location: 'New York' },
+        { date: '2024-06-02', text: 'Fever symptoms spreading', location: 'London' },
+        { date: '2024-06-03', text: 'Sick with fever today', location: 'Mumbai' }
+      ],
+      cough: [
+        { date: '2024-06-01', text: 'Dry cough won’t stop', location: 'Paris' },
+        { date: '2024-06-02', text: 'Lots of coughing cases', location: 'Berlin' },
+        { date: '2024-06-03', text: 'Persistent cough for days', location: 'Toronto' }
+      ],
+      flu: [
+        { date: '2024-06-01', text: 'Flu season starts early', location: 'Sydney' },
+        { date: '2024-06-02', text: 'Symptoms: fever, fatigue, cough', location: 'Chicago' },
+        { date: '2024-06-03', text: 'Got the flu despite vaccine', location: 'Tokyo' }
+      ]
+    };
+
+    function loadData() {
+      const selected = document.getElementById('symptom').value;
+      const posts = data[selected];
+      const status = document.getElementById('status');
+      const trendSection = document.getElementById('trend-section');
+      const sentimentSection = document.getElementById('sentiment-section');
+      const tableSection = document.getElementById('table-section');
+
+      // Count by date
+      const dateCounts = {};
+      posts.forEach(post => {
+        dateCounts[post.date] = (dateCounts[post.date] || 0) + 1;
+      });
+
+      // Sentiment (fake: hardcoded counts)
+      const sentiments = {
+        fever: [2, 0, 1],
+        cough: [1, 1, 1],
+        flu: [1, 1, 1]
+      };
+
+      // Update trend chart
+      const trendCtx = document.getElementById('trendChart').getContext('2d');
+      new Chart(trendCtx, {
+        type: 'line',
+        data: {
+          labels: Object.keys(dateCounts),
+          datasets: [{
+            label: 'Posts per day',
+            data: Object.values(dateCounts),
+            borderColor: '#2a9d8f',
+            backgroundColor: 'rgba(42,157,143,0.3)',
+            fill: true
+          }]
+        }
+      });
+
+      // Update sentiment chart
+      const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
+      new Chart(sentimentCtx, {
+        type: 'pie',
+        data: {
+          labels: ['Positive', 'Negative', 'Neutral'],
+          datasets: [{
+            data: sentiments[selected],
+            backgroundColor: ['#27ae60', '#e74c3c', '#95a5a6']
+          }]
+        }
+      });
+
+      // Update table
+      const table = document.getElementById('posts-table');
+      table.innerHTML = '';
+      posts.forEach(p => {
+        const row = `<tr><td>${p.date}</td><td>${p.text}</td><td>${p.location}</td></tr>`;
+        table.innerHTML += row;
+      });
+
+      // Show sections
+      trendSection.style.display = 'block';
+      sentimentSection.style.display = 'block';
+      tableSection.style.display = 'block';
+      status.textContent = `Loaded ${posts.length} posts for ${selected}`;
+    }
   </script>
 </body>
 </html>
